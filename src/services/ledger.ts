@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import {
+import type {
   Account,
   Transaction,
   Entry,
@@ -8,6 +8,11 @@ import {
   Direction,
 } from '@models/types.ts';
 import { storage } from '@services/storage.ts';
+
+interface TransactionValidationResult {
+  valid: boolean;
+  error: string;
+}
 
 /**
  * Apply an entry to an account's balance
@@ -31,7 +36,7 @@ function applyEntryToBalance(
  */
 function validateTransactionBalance(
   entries: Omit<Entry, 'id'>[]
-): { valid: boolean; error?: string } {
+): TransactionValidationResult {
   let totalDebits = 0;
   let totalCredits = 0;
 
@@ -50,7 +55,7 @@ function validateTransactionBalance(
     };
   }
 
-  return { valid: true };
+  return { valid: true, error: '' };
 }
 
 /**
@@ -59,10 +64,13 @@ function validateTransactionBalance(
 export function createAccount(request: CreateAccountRequest): Account {
   const account: Account = {
     id: request.id || randomUUID(),
-    name: request.name,
-    balance: request.balance || 0,
+    balance: request.balance ?? 0,
     direction: request.direction,
   };
+
+  if (request.name !== undefined) {
+    account.name = request.name;
+  }
 
   storage.saveAccount(account);
   return account;
@@ -107,9 +115,12 @@ export function createTransaction(
   // Create transaction
   const transaction: Transaction = {
     id: request.id || randomUUID(),
-    name: request.name,
     entries,
   };
+
+  if (request.name !== undefined) {
+    transaction.name = request.name;
+  }
 
   // Apply transaction to all affected accounts
   for (const entry of entries) {

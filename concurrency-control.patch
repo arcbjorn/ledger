@@ -1,8 +1,111 @@
+diff --git a/src/handlers/transactions.test.ts b/src/handlers/transactions.test.ts
+index 10100aa..67c95bd 100644
+--- a/src/handlers/transactions.test.ts
++++ b/src/handlers/transactions.test.ts
+@@ -41,7 +41,7 @@ describe('transactions handler', () => {
+           ],
+         };
+ 
+-        vi.mocked(ledger.createTransaction).mockReturnValue({
++        vi.mocked(ledger.createTransaction).mockResolvedValue({
+           success: true,
+           transaction: {
+             id: 'txn-1',
+@@ -105,7 +105,7 @@ describe('transactions handler', () => {
+           ],
+         };
+ 
+-        vi.mocked(ledger.createTransaction).mockReturnValue({
++        vi.mocked(ledger.createTransaction).mockResolvedValue({
+           success: true,
+           transaction: {
+             id: 'txn-1',
+@@ -207,7 +207,7 @@ describe('transactions handler', () => {
+           ],
+         };
+ 
+-        vi.mocked(ledger.createTransaction).mockReturnValue({
++        vi.mocked(ledger.createTransaction).mockResolvedValue({
+           success: true,
+           transaction: {
+             id: 'txn-1',
+@@ -251,7 +251,7 @@ describe('transactions handler', () => {
+           ],
+         };
+ 
+-        vi.mocked(ledger.createTransaction).mockReturnValue({
++        vi.mocked(ledger.createTransaction).mockResolvedValue({
+           success: true,
+           transaction: createdTransaction,
+         });
+@@ -277,7 +277,7 @@ describe('transactions handler', () => {
+           ],
+         };
+ 
+-        vi.mocked(ledger.createTransaction).mockReturnValue({
++        vi.mocked(ledger.createTransaction).mockResolvedValue({
+           success: false,
+           error: 'Transaction not balanced: debits=100, credits=50',
+         });
+@@ -305,7 +305,7 @@ describe('transactions handler', () => {
+           ],
+         };
+ 
+-        vi.mocked(ledger.createTransaction).mockReturnValue({
++        vi.mocked(ledger.createTransaction).mockResolvedValue({
+           success: false,
+           error: 'Account not found: non-existent',
+         });
+@@ -333,7 +333,7 @@ describe('transactions handler', () => {
+           ],
+         };
+ 
+-        vi.mocked(ledger.createTransaction).mockReturnValue({
++        vi.mocked(ledger.createTransaction).mockResolvedValue({
+           success: false,
+           error: 'Account is disabled: disabled-acc',
+         });
+@@ -365,7 +365,7 @@ describe('transactions handler', () => {
+           ],
+         };
+ 
+-        vi.mocked(ledger.createTransaction).mockReturnValue({
++        vi.mocked(ledger.createTransaction).mockResolvedValue({
+           success: true,
+           transaction: {
+             id: 'custom-txn-id',
+@@ -398,7 +398,7 @@ describe('transactions handler', () => {
+           ],
+         };
+ 
+-        vi.mocked(ledger.createTransaction).mockReturnValue({
++        vi.mocked(ledger.createTransaction).mockResolvedValue({
+           success: true,
+           transaction: {
+             id: 'txn-1',
+@@ -429,7 +429,7 @@ describe('transactions handler', () => {
+           entries: [{ direction: DIRECTION.DEBIT, account_id: 'acc-1', amount: 100 }],
+         };
+ 
+-        vi.mocked(ledger.createTransaction).mockReturnValue({
++        vi.mocked(ledger.createTransaction).mockResolvedValue({
+           success: true,
+           transaction: {
+             id: 'txn-1',
+@@ -461,7 +461,7 @@ describe('transactions handler', () => {
+           ],
+         };
+ 
+-        vi.mocked(ledger.createTransaction).mockReturnValue({
++        vi.mocked(ledger.createTransaction).mockResolvedValue({
+           success: true,
+           transaction: {
+             id: 'txn-1',
 diff --git a/src/handlers/transactions.ts b/src/handlers/transactions.ts
-index 9fac5a7..baa099b 100644
+index 1736734..c77f5c3 100644
 --- a/src/handlers/transactions.ts
 +++ b/src/handlers/transactions.ts
-@@ -30,7 +30,7 @@ export async function handleCreateTransaction(
+@@ -31,7 +31,7 @@ export async function handleCreateTransaction(
        return;
      }
  
@@ -10,9 +113,175 @@ index 9fac5a7..baa099b 100644
 +    const result = await createTransaction(body);
  
      if (!result.success) {
-       res.writeHead(400, { 'Content-Type': 'application/json' });
+       respond(res, HTTP_STATUS.BAD_REQUEST, { error: result.error! });
+diff --git a/src/services/ledger.test.ts b/src/services/ledger.test.ts
+index 77d1ec6..92f5c82 100644
+--- a/src/services/ledger.test.ts
++++ b/src/services/ledger.test.ts
+@@ -143,8 +143,8 @@ describe('createTransaction', () => {
+     });
+   });
+ 
+-  it('should create transaction with generated id', () => {
+-    const result = createTransaction({
++  it('should create transaction with generated id', async () => {
++    const result = await createTransaction({
+       name: 'Test Transaction',
+       entries: [
+         { direction: DIRECTION.DEBIT, account_id: 'debit-account', amount: 100 },
+@@ -160,8 +160,8 @@ describe('createTransaction', () => {
+     expect(result.transaction!.entries).toHaveLength(2);
+   });
+ 
+-  it('should create transaction with provided id', () => {
+-    const result = createTransaction({
++  it('should create transaction with provided id', async () => {
++    const result = await createTransaction({
+       id: 'custom-transaction-id',
+       name: 'Custom ID Transaction',
+       entries: [
+@@ -174,8 +174,8 @@ describe('createTransaction', () => {
+     expect(result.transaction!.id).toBe('custom-transaction-id');
+   });
+ 
+-  it('should generate unique ids for entries', () => {
+-    const result = createTransaction({
++  it('should generate unique ids for entries', async () => {
++    const result = await createTransaction({
+       entries: [
+         { direction: DIRECTION.DEBIT, account_id: 'debit-account', amount: 25 },
+         { direction: DIRECTION.CREDIT, account_id: 'credit-account', amount: 25 },
+@@ -189,8 +189,8 @@ describe('createTransaction', () => {
+     expect(ids[0]).not.toBe(ids[1]);
+   });
+ 
+-  it('should reject unbalanced transaction', () => {
+-    const result = createTransaction({
++  it('should reject unbalanced transaction', async () => {
++    const result = await createTransaction({
+       entries: [
+         { direction: DIRECTION.DEBIT, account_id: 'debit-account', amount: 100 },
+         { direction: DIRECTION.CREDIT, account_id: 'credit-account', amount: 50 },
+@@ -203,8 +203,8 @@ describe('createTransaction', () => {
+     expect(result.error).toContain('credits=50');
+   });
+ 
+-  it('should reject transaction with non-existent account', () => {
+-    const result = createTransaction({
++  it('should reject transaction with non-existent account', async () => {
++    const result = await createTransaction({
+       entries: [
+         { direction: DIRECTION.DEBIT, account_id: 'non-existent', amount: 100 },
+         { direction: DIRECTION.CREDIT, account_id: 'credit-account', amount: 100 },
+@@ -215,10 +215,10 @@ describe('createTransaction', () => {
+     expect(result.error).toBe('Account not found: non-existent');
+   });
+ 
+-  it('should reject transaction with disabled account', () => {
++  it('should reject transaction with disabled account', async () => {
+     disableAccount('debit-account');
+ 
+-    const result = createTransaction({
++    const result = await createTransaction({
+       entries: [
+         { direction: DIRECTION.DEBIT, account_id: 'debit-account', amount: 100 },
+         { direction: DIRECTION.CREDIT, account_id: 'credit-account', amount: 100 },
+@@ -230,8 +230,8 @@ describe('createTransaction', () => {
+   });
+ 
+   describe('balance calculations', () => {
+-    it('should increase debit account with debit entry', () => {
+-      createTransaction({
++    it('should increase debit account with debit entry', async () => {
++      await createTransaction({
+         entries: [
+           { direction: DIRECTION.DEBIT, account_id: 'debit-account', amount: 50 },
+           { direction: DIRECTION.CREDIT, account_id: 'credit-account', amount: 50 },
+@@ -242,8 +242,8 @@ describe('createTransaction', () => {
+       expect(account!.balance).toBe(150); // 100 + 50
+     });
+ 
+-    it('should decrease debit account with credit entry', () => {
+-      createTransaction({
++    it('should decrease debit account with credit entry', async () => {
++      await createTransaction({
+         entries: [
+           { direction: DIRECTION.CREDIT, account_id: 'debit-account', amount: 30 },
+           { direction: DIRECTION.DEBIT, account_id: 'credit-account', amount: 30 },
+@@ -254,8 +254,8 @@ describe('createTransaction', () => {
+       expect(account!.balance).toBe(70); // 100 - 30
+     });
+ 
+-    it('should increase credit account with credit entry', () => {
+-      createTransaction({
++    it('should increase credit account with credit entry', async () => {
++      await createTransaction({
+         entries: [
+           { direction: DIRECTION.DEBIT, account_id: 'debit-account', amount: 25 },
+           { direction: DIRECTION.CREDIT, account_id: 'credit-account', amount: 25 },
+@@ -266,8 +266,8 @@ describe('createTransaction', () => {
+       expect(account!.balance).toBe(75); // 50 + 25
+     });
+ 
+-    it('should decrease credit account with debit entry', () => {
+-      createTransaction({
++    it('should decrease credit account with debit entry', async () => {
++      await createTransaction({
+         entries: [
+           { direction: DIRECTION.CREDIT, account_id: 'debit-account', amount: 20 },
+           { direction: DIRECTION.DEBIT, account_id: 'credit-account', amount: 20 },
+@@ -278,8 +278,8 @@ describe('createTransaction', () => {
+       expect(account!.balance).toBe(30); // 50 - 20
+     });
+ 
+-    it('should handle multiple entries on same account', () => {
+-      const result = createTransaction({
++    it('should handle multiple entries on same account', async () => {
++      const result = await createTransaction({
+         entries: [
+           { direction: DIRECTION.DEBIT, account_id: 'debit-account', amount: 60 },
+           { direction: DIRECTION.CREDIT, account_id: 'debit-account', amount: 40 },
+@@ -293,14 +293,14 @@ describe('createTransaction', () => {
+       expect(account!.balance).toBe(120);
+     });
+ 
+-    it('should handle complex multi-entry transaction', () => {
++    it('should handle complex multi-entry transaction', async () => {
+       createAccount({
+         id: 'account-3',
+         direction: DIRECTION.DEBIT,
+         balance: 200,
+       });
+ 
+-      createTransaction({
++      await createTransaction({
+         entries: [
+           { direction: DIRECTION.DEBIT, account_id: 'debit-account', amount: 100 },
+           { direction: DIRECTION.DEBIT, account_id: 'account-3', amount: 50 },
+@@ -314,8 +314,8 @@ describe('createTransaction', () => {
+     });
+   });
+ 
+-  it('should allow transaction with zero amounts', () => {
+-    const result = createTransaction({
++  it('should allow transaction with zero amounts', async () => {
++    const result = await createTransaction({
+       entries: [
+         { direction: DIRECTION.DEBIT, account_id: 'debit-account', amount: 0 },
+         { direction: DIRECTION.CREDIT, account_id: 'credit-account', amount: 0 },
+@@ -327,8 +327,8 @@ describe('createTransaction', () => {
+     expect(storage.getAccount('credit-account')!.balance).toBe(50);
+   });
+ 
+-  it('should store transaction in storage', () => {
+-    const result = createTransaction({
++  it('should store transaction in storage', async () => {
++    const result = await createTransaction({
+       id: 'stored-transaction',
+       entries: [
+         { direction: DIRECTION.DEBIT, account_id: 'debit-account', amount: 10 },
 diff --git a/src/services/ledger.ts b/src/services/ledger.ts
-index c11154a..301ce7d 100644
+index 7b6d598..deae278 100644
 --- a/src/services/ledger.ts
 +++ b/src/services/ledger.ts
 @@ -9,6 +9,7 @@ import type {
@@ -23,7 +292,7 @@ index c11154a..301ce7d 100644
  
  /**
   * Apply an entry to an account's balance
-@@ -82,9 +83,9 @@ export function getAccount(id: string): Account | undefined {
+@@ -103,9 +104,9 @@ export function disableAccount(id: string): { success: boolean; error?: string }
  /**
   * Create a new transaction and apply it to all affected accounts
   */
@@ -35,7 +304,7 @@ index c11154a..301ce7d 100644
    // Validate transaction balance
    const validation = validateTransactionBalance(request.entries);
    if (!validation.valid) {
-@@ -118,30 +119,35 @@ export function createTransaction(
+@@ -145,30 +146,35 @@ export function createTransaction(
      transaction.name = request.name;
    }
  

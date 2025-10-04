@@ -1,6 +1,6 @@
 import type { Account, Transaction } from '@/types/index';
 
-class Storage {
+export class Storage {
   private accounts: Map<string, Account> = new Map();
   private transactions: Map<string, Transaction> = new Map();
 

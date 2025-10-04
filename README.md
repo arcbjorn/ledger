@@ -129,6 +129,12 @@ POST /transactions
 
 ## Double-Entry Accounting Rules
 
+### Account Lifecycle
+
+- **Creation**: Accounts are created with an initial balance and direction
+- **Modification**: Balances can only be modified through transactions
+- **Deletion**: Accounts cannot be deleted once created. In production systems, implement soft deletion to preserve transaction history and ledger integrity
+
 ### Account Directions
 
 Each account has a direction: **debit** or **credit**.

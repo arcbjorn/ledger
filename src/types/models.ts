@@ -19,16 +19,3 @@ export interface Transaction {
   name?: string;
   entries: Entry[];
 }
-
-export interface CreateAccountRequest {
-  id?: string;
-  name?: string;
-  balance?: number;
-  direction: Direction;
-}
-
-export interface CreateTransactionRequest {
-  id?: string;
-  name?: string;
-  entries: Omit<Entry, 'id'>[];
-}

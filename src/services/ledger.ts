@@ -7,6 +7,7 @@ import type {
   CreateTransactionRequest,
   Direction,
   TransactionValidationResult,
+  DisableAccountResult,
 } from '@/types/index';
 import { storage } from '@services/storage.ts';
 
@@ -87,7 +88,7 @@ export function getAccount(id: string): Account | undefined {
 /**
  * Disable an account by ID
  */
-export function disableAccount(id: string): { success: boolean; error?: string } {
+export function disableAccount(id: string): DisableAccountResult {
   const account = storage.getAccount(id);
   if (!account) {
     return { success: false, error: 'Account not found' };

@@ -281,18 +281,18 @@ index 77d1ec6..92f5c82 100644
        entries: [
          { direction: DIRECTION.DEBIT, account_id: 'debit-account', amount: 10 },
 diff --git a/src/services/ledger.ts b/src/services/ledger.ts
-index 7b6d598..deae278 100644
+index c332b68..06c505e 100644
 --- a/src/services/ledger.ts
 +++ b/src/services/ledger.ts
-@@ -9,6 +9,7 @@ import type {
-   TransactionValidationResult,
+@@ -10,6 +10,7 @@ import type {
+   DisableAccountResult,
  } from '@/types/index';
  import { storage } from '@services/storage.ts';
 +import { accountLock } from '@services/lock.ts';
  
  /**
   * Apply an entry to an account's balance
-@@ -103,9 +104,9 @@ export function disableAccount(id: string): { success: boolean; error?: string }
+@@ -104,9 +105,9 @@ export function disableAccount(id: string): DisableAccountResult {
  /**
   * Create a new transaction and apply it to all affected accounts
   */
@@ -304,7 +304,7 @@ index 7b6d598..deae278 100644
    // Validate transaction balance
    const validation = validateTransactionBalance(request.entries);
    if (!validation.valid) {
-@@ -145,30 +146,35 @@ export function createTransaction(
+@@ -146,30 +147,35 @@ export function createTransaction(
      transaction.name = request.name;
    }
  

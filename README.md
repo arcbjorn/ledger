@@ -32,6 +32,10 @@ pnpm install
 
 ## API Endpoints
 
+### GET /openapi.json
+
+Get the OpenAPI 3.1 specification for this API.
+
 ### POST /accounts
 
 Create a new account.

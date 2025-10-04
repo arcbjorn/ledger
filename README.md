@@ -2,25 +2,18 @@
 
 A TypeScript implementation of a double-entry accounting ledger system with an HTTP/JSON API.
 
+See [INSTRUCTIONS.md](./INSTRUCTIONS.md) for double-entry accounting rules and requirements.
+
 ## Table of Contents
 
-- [Features](#features)
 - [Installation](#installation)
 - [Usage](#usage)
 - [API Endpoints](#api-endpoints)
-- [Double-Entry Accounting Rules](#double-entry-accounting-rules)
 - [Testing](#testing)
 - [Project Structure](#project-structure)
 - [Tech Stack](#tech-stack)
+- [Account Lifecycle](#account-lifecycle)
 - [Concurrency Control](#concurrency-control)
-
-## Features
-
-- **Double-entry accounting** - Every transaction balances debits and credits
-- **Account management** - Create, track and disable debit/credit accounts
-- **Transaction validation** - Automatic balance verification
-- **In-memory storage** - Fast, simple data persistence
-- **RESTful API** - Clean HTTP/JSON endpoints
 
 ## Installation
 
@@ -39,20 +32,26 @@ pnpm install
 
 ## API Endpoints
 
-### Create Account
+### POST /accounts
 
-```bash
-POST /accounts
-```
+Create a new account.
 
 **Request:**
 ```json
 {
   "name": "Cash",
   "direction": "debit",
-  "balance": 0
+  "balance": 0,
+  "id": "71cde2aa-b9bc-496a-a6f1-34964d05e6fd"
 }
 ```
+
+| Field     | Description                                               |
+|-----------|-----------------------------------------------------------|
+| id        | Optional. If not provided, generated on object creation. |
+| name      | Optional label for the account.                           |
+| balance   | Optional. Account's initial balance in USD (default: 0).  |
+| direction | Required. Must be either "debit" or "credit".             |
 
 **Response:**
 ```json
@@ -65,11 +64,9 @@ POST /accounts
 }
 ```
 
-### Get Account
+### GET /accounts/:id
 
-```bash
-GET /accounts/:id
-```
+Get account details.
 
 **Response:**
 ```json
@@ -82,13 +79,9 @@ GET /accounts/:id
 }
 ```
 
-### Delete Account (Disable)
+### DELETE /accounts/:id
 
-```bash
-DELETE /accounts/:id
-```
-
-Disables an account, preventing future transactions while preserving history.
+Disable an account (soft delete).
 
 **Response:** `204 No Content`
 
@@ -96,16 +89,15 @@ Disables an account, preventing future transactions while preserving history.
 - `400` - Account not found or already disabled
 - `404` - Invalid account ID
 
-### Create Transaction
+### POST /transactions
 
-```bash
-POST /transactions
-```
+Create a new transaction.
 
 **Request:**
 ```json
 {
   "name": "Transfer",
+  "id": "3256dc3c-7b18-4a21-95c6-146747cf2971",
   "entries": [
     {
       "direction": "debit",
@@ -120,6 +112,20 @@ POST /transactions
   ]
 }
 ```
+
+| Field   | Description                                               |
+|---------|-----------------------------------------------------------|
+| id      | Optional. If not provided, generated on object creation. |
+| name    | Optional label for the transaction.                       |
+| entries | Required. Array of entry objects (debits must equal credits). |
+
+**Entry fields:**
+
+| Field      | Description                                   |
+|------------|-----------------------------------------------|
+| direction  | Required. Must be either "debit" or "credit". |
+| account_id | Required. ID of the account to modify.        |
+| amount     | Required. Amount in USD.                      |
 
 **Response:**
 ```json
@@ -143,40 +149,12 @@ POST /transactions
 }
 ```
 
-## Double-Entry Accounting Rules
-
-### Account Lifecycle
+## Account Lifecycle
 
 - **Creation**: Accounts are created with an initial balance and direction (disabled=false by default)
 - **Modification**: Balances can only be modified through transactions
 - **Disabling**: Accounts can be disabled to prevent future transactions while preserving transaction history
 - **Deletion**: Accounts cannot be deleted once created to maintain ledger integrity
-
-### Account Directions
-
-Each account has a direction: **debit** or **credit**.
-
-### Balance Calculation
-
-When an entry is applied to an account:
-- **Same directions** → Balance increases (add)
-- **Opposite directions** → Balance decreases (subtract)
-
-**Examples:**
-
-| Account Direction | Entry Direction | Entry Amount | Result |
-|-------------------|-----------------|--------------|--------|
-| debit | debit | +100 | Balance +100 |
-| credit | credit | +100 | Balance +100 |
-| debit | credit | +100 | Balance -100 |
-| credit | debit | +100 | Balance -100 |
-
-### Transaction Validation
-
-All transactions must balance:
-- **Sum of debits = Sum of credits**
-
-If debits ≠ credits, the transaction is rejected with a 400 error.
 
 ## Testing
 

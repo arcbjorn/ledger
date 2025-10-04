@@ -7,11 +7,19 @@
     // Environment Settings
     // See also https://aka.ms/tsconfig/module
     "module": "nodenext",
+    "moduleResolution": "bundler",
     "target": "esnext",
     // "lib": ["esnext"],
     "types": [
       "node"
     ],
+    // Path Aliases
+    "baseUrl": ".",
+    "paths": {
+      "@models/*": ["src/models/*"],
+      "@services/*": ["src/services/*"],
+      "@handlers/*": ["src/handlers/*"]
+    },
     // Other Outputs
     "sourceMap": true,
     "declaration": true,

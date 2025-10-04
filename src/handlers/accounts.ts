@@ -1,6 +1,6 @@
 import http from 'node:http';
 import type { CreateAccountRequest } from '@/types/index';
-import { createAccount, getAccount } from '@services/ledger.ts';
+import { createAccount, getAccount, disableAccount } from '@services/ledger.ts';
 
 async function parseBody<T>(req: http.IncomingMessage): Promise<T> {
   return new Promise((resolve, reject) => {
@@ -62,4 +62,28 @@ export async function handleGetAccount(
 
   res.writeHead(200, { 'Content-Type': 'application/json' });
   res.end(JSON.stringify(account));
+}
+
+export async function handleDeleteAccount(
+  req: http.IncomingMessage,
+  res: http.ServerResponse,
+  params: Record<string, string>
+): Promise<void> {
+  const id = params.id;
+  if (!id) {
+    res.writeHead(400, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: 'Account ID required' }));
+    return;
+  }
+
+  const result = disableAccount(id);
+
+  if (!result.success) {
+    res.writeHead(400, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: result.error }));
+    return;
+  }
+
+  res.writeHead(204);
+  res.end();
 }

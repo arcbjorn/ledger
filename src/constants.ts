@@ -4,6 +4,11 @@ export const HTTP_METHOD = {
   DELETE: 'DELETE',
 } as const;
 
+export const ACCOUNT_DIRECTION = {
+  DEBIT: 'debit',
+  CREDIT: 'credit',
+} as const;
+
 export const HTTP_STATUS = {
   OK: 200,
   CREATED: 201,

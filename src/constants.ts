@@ -4,7 +4,7 @@ export const HTTP_METHOD = {
   DELETE: 'DELETE',
 } as const;
 
-export const ACCOUNT_DIRECTION = {
+export const DIRECTION = {
   DEBIT: 'debit',
   CREDIT: 'credit',
 } as const;

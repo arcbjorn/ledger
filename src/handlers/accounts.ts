@@ -1,7 +1,7 @@
 import http from 'node:http';
 import type { CreateAccountRequest } from '@/types/index';
 import { createAccount, getAccount, disableAccount } from '@services/ledger.ts';
-import { HTTP_STATUS, ERROR_MESSAGES, ACCOUNT_DIRECTION } from '@constants';
+import { HTTP_STATUS, ERROR_MESSAGES, DIRECTION } from '@constants';
 import { respond } from '@utils/response';
 
 async function parseBody<T>(req: http.IncomingMessage): Promise<T> {
@@ -26,7 +26,7 @@ export async function handleCreateAccount(
   try {
     const body = await parseBody<CreateAccountRequest>(req);
 
-    if (!body.direction || ![ACCOUNT_DIRECTION.DEBIT, ACCOUNT_DIRECTION.CREDIT].includes(body.direction)) {
+    if (!body.direction || ![DIRECTION.DEBIT, DIRECTION.CREDIT].includes(body.direction)) {
       respond(res, HTTP_STATUS.BAD_REQUEST, { error: ERROR_MESSAGES.INVALID_DIRECTION });
       return;
     }

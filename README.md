@@ -168,7 +168,7 @@ Run unit tests:
 pnpm test
 ```
 
-Run integration tests:
+Run integration tests (requires `jq`):
 
 ```bash
 ./test.sh

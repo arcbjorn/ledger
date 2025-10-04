@@ -1,3 +1,9 @@
+export const HTTP_METHOD = {
+  GET: 'GET',
+  POST: 'POST',
+  DELETE: 'DELETE',
+} as const;
+
 export const HTTP_STATUS = {
   OK: 200,
   CREATED: 201,

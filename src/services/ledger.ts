@@ -62,6 +62,7 @@ export function createAccount(request: CreateAccountRequest): Account {
     id: randomUUID(),
     balance: request.balance ?? 0,
     direction: request.direction,
+    disabled: false,
   };
 
   if (request.name !== undefined) {
@@ -76,7 +77,27 @@ export function createAccount(request: CreateAccountRequest): Account {
  * Get an account by ID
  */
 export function getAccount(id: string): Account | undefined {
-  return storage.getAccount(id);
+  const account = storage.getAccount(id);
+  if (account && account.disabled) {
+    return undefined;
+  }
+  return account;
+}
+
+/**
+ * Disable an account by ID
+ */
+export function disableAccount(id: string): { success: boolean; error?: string } {
+  const account = storage.getAccount(id);
+  if (!account) {
+    return { success: false, error: 'Account not found' };
+  }
+  if (account.disabled) {
+    return { success: false, error: 'Account already disabled' };
+  }
+  account.disabled = true;
+  storage.saveAccount(account);
+  return { success: true };
 }
 
 /**
@@ -91,13 +112,19 @@ export function createTransaction(
     return { success: false, error: validation.error };
   }
 
-  // Check that all accounts exist
+  // Check that all accounts exist and are not disabled
   for (const entry of request.entries) {
     const account = storage.getAccount(entry.account_id);
     if (!account) {
       return {
         success: false,
         error: `Account not found: ${entry.account_id}`,
+      };
+    }
+    if (account.disabled) {
+      return {
+        success: false,
+        error: `Account is disabled: ${entry.account_id}`,
       };
     }
   }

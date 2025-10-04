@@ -12,6 +12,7 @@ A TypeScript implementation of a double-entry accounting ledger system with an H
 - [Testing](#testing)
 - [Project Structure](#project-structure)
 - [Tech Stack](#tech-stack)
+- [Concurrency Control](#concurrency-control)
 
 ## Features
 
@@ -220,3 +221,17 @@ ledger/
 - **Build Tool**: Vite
 - **Dev Server**: vite-node
 - **Package Manager**: pnpm
+
+## Concurrency Control
+
+The ledger includes an optional concurrency control mechanism using account-level locks. This is a future enhancement that prevents race conditions when adding async database operations. While databases typically handle concurrency at their level, this implementation provides application-level control.
+
+**Enable concurrency control:**
+
+```bash
+git apply concurrency-control.patch
+```
+
+This adds mutex locks that ensure transactions modifying the same accounts execute sequentially, while allowing concurrent transactions on different accounts.
+
+See `src/services/lock.ts` for the implementation.

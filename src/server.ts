@@ -1,4 +1,5 @@
 import http from 'node:http';
+import '@handlers/routes.ts';
 import { handleRequest } from '@handlers/router.ts';
 
 const PORT = 5000;

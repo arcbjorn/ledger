@@ -1,6 +1,7 @@
 import http from 'node:http';
 import type { CreateAccountRequest } from '@/types/index';
 import { createAccount, getAccount, disableAccount } from '@services/ledger.ts';
+import { HTTP_STATUS, CONTENT_TYPE, ERROR_MESSAGES } from '@constants';
 
 async function parseBody<T>(req: http.IncomingMessage): Promise<T> {
   return new Promise((resolve, reject) => {
@@ -10,7 +11,7 @@ async function parseBody<T>(req: http.IncomingMessage): Promise<T> {
       try {
         resolve(JSON.parse(body));
       } catch (error) {
-        reject(new Error('Invalid JSON'));
+        reject(new Error(ERROR_MESSAGES.INVALID_JSON));
       }
     });
     req.on('error', reject);
@@ -25,18 +26,18 @@ export async function handleCreateAccount(
     const body = await parseBody<CreateAccountRequest>(req);
 
     if (!body.direction || !['debit', 'credit'].includes(body.direction)) {
-      res.writeHead(400, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ error: 'Invalid direction' }));
+      res.writeHead(HTTP_STATUS.BAD_REQUEST, CONTENT_TYPE.JSON);
+      res.end(JSON.stringify({ error: ERROR_MESSAGES.INVALID_DIRECTION }));
       return;
     }
 
     const account = createAccount(body);
 
-    res.writeHead(201, { 'Content-Type': 'application/json' });
+    res.writeHead(HTTP_STATUS.CREATED, CONTENT_TYPE.JSON);
     res.end(JSON.stringify(account));
   } catch (error) {
-    res.writeHead(400, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ error: 'Bad request' }));
+    res.writeHead(HTTP_STATUS.BAD_REQUEST, CONTENT_TYPE.JSON);
+    res.end(JSON.stringify({ error: ERROR_MESSAGES.BAD_REQUEST }));
   }
 }
 
@@ -47,20 +48,20 @@ export async function handleGetAccount(
 ): Promise<void> {
   const id = params.id;
   if (!id) {
-    res.writeHead(400, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ error: 'Account ID required' }));
+    res.writeHead(HTTP_STATUS.BAD_REQUEST, CONTENT_TYPE.JSON);
+    res.end(JSON.stringify({ error: ERROR_MESSAGES.ACCOUNT_ID_REQUIRED }));
     return;
   }
 
   const account = getAccount(id);
 
   if (!account) {
-    res.writeHead(404, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ error: 'Account not found' }));
+    res.writeHead(HTTP_STATUS.NOT_FOUND, CONTENT_TYPE.JSON);
+    res.end(JSON.stringify({ error: ERROR_MESSAGES.ACCOUNT_NOT_FOUND }));
     return;
   }
 
-  res.writeHead(200, { 'Content-Type': 'application/json' });
+  res.writeHead(HTTP_STATUS.OK, CONTENT_TYPE.JSON);
   res.end(JSON.stringify(account));
 }
 
@@ -71,19 +72,19 @@ export async function handleDeleteAccount(
 ): Promise<void> {
   const id = params.id;
   if (!id) {
-    res.writeHead(400, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ error: 'Account ID required' }));
+    res.writeHead(HTTP_STATUS.BAD_REQUEST, CONTENT_TYPE.JSON);
+    res.end(JSON.stringify({ error: ERROR_MESSAGES.ACCOUNT_ID_REQUIRED }));
     return;
   }
 
   const result = disableAccount(id);
 
   if (!result.success) {
-    res.writeHead(400, { 'Content-Type': 'application/json' });
+    res.writeHead(HTTP_STATUS.BAD_REQUEST, CONTENT_TYPE.JSON);
     res.end(JSON.stringify({ error: result.error }));
     return;
   }
 
-  res.writeHead(204);
+  res.writeHead(HTTP_STATUS.NO_CONTENT);
   res.end();
 }

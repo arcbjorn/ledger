@@ -43,6 +43,10 @@ class Router {
     this.add('POST', path, handler);
   }
 
+  delete(path: string, handler: Handler): void {
+    this.add('DELETE', path, handler);
+  }
+
   async handle(req: http.IncomingMessage, res: http.ServerResponse): Promise<void> {
     const url = new URL(req.url || '', `http://${req.headers.host}`);
     const method = req.method || 'GET';

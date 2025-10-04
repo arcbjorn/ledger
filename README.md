@@ -203,14 +203,20 @@ ledger/
 │   │   └── index.ts          # Type exports
 │   ├── services/
 │   │   ├── storage.ts        # In-memory data store
-│   │   └── ledger.ts         # Business logic
+│   │   ├── ledger.ts         # Business logic
+│   │   └── ledger.test.ts    # Ledger unit tests
 │   ├── handlers/
 │   │   ├── router.ts         # HTTP routing
+│   │   ├── router.test.ts    # Router unit tests
 │   │   ├── routes.ts         # Route registration
 │   │   ├── accounts.ts       # Account endpoints
 │   │   └── transactions.ts   # Transaction endpoints
+│   ├── utils/
+│   │   └── response.ts       # HTTP response helpers
+│   ├── constants.ts          # Shared constants
 │   └── server.ts             # Entry point
 ├── vite.config.ts            # Vite configuration
+├── vitest.config.ts          # Vitest configuration
 ├── tsconfig.json             # TypeScript configuration
 └── package.json
 ```

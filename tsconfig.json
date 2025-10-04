@@ -16,8 +16,8 @@
     // Path Aliases
     "baseUrl": ".",
     "paths": {
-      "@/types/*": [
-        "src/types/*"
+      "@/*": [
+        "src/*"
       ],
       "@constants": [
         "src/constants.ts"

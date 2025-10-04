@@ -1,4 +1,5 @@
 import http from 'node:http';
+import { HTTP_METHOD, HTTP_STATUS, CONTENT_TYPE, ERROR_MESSAGES } from '@constants';
 
 type Handler = (
   req: http.IncomingMessage,
@@ -36,20 +37,20 @@ class Router {
   }
 
   get(path: string, handler: Handler): void {
-    this.add('GET', path, handler);
+    this.add(HTTP_METHOD.GET, path, handler);
   }
 
   post(path: string, handler: Handler): void {
-    this.add('POST', path, handler);
+    this.add(HTTP_METHOD.POST, path, handler);
   }
 
   delete(path: string, handler: Handler): void {
-    this.add('DELETE', path, handler);
+    this.add(HTTP_METHOD.DELETE, path, handler);
   }
 
   async handle(req: http.IncomingMessage, res: http.ServerResponse): Promise<void> {
     const url = new URL(req.url || '', `http://${req.headers.host}`);
-    const method = req.method || 'GET';
+    const method = req.method || HTTP_METHOD.GET;
     const pathname = url.pathname;
 
     // Find matching route
@@ -70,15 +71,15 @@ class Router {
         return;
       } catch (error) {
         console.error('Handler error:', error);
-        res.writeHead(500, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: 'Internal server error' }));
+        res.writeHead(HTTP_STATUS.INTERNAL_SERVER_ERROR, CONTENT_TYPE.JSON);
+        res.end(JSON.stringify({ error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR }));
         return;
       }
     }
 
     // No route matched
-    res.writeHead(404, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ error: 'Not found' }));
+    res.writeHead(HTTP_STATUS.NOT_FOUND, CONTENT_TYPE.JSON);
+    res.end(JSON.stringify({ error: ERROR_MESSAGES.NOT_FOUND }));
   }
 }
 

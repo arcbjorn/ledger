@@ -1,7 +1,8 @@
 import http from 'node:http';
 import type { CreateAccountRequest } from '@/types/index';
 import { createAccount, getAccount, disableAccount } from '@services/ledger.ts';
-import { HTTP_STATUS, CONTENT_TYPE, ERROR_MESSAGES } from '@constants';
+import { HTTP_STATUS, ERROR_MESSAGES, ACCOUNT_DIRECTION } from '@constants';
+import { respond } from '@utils/response';
 
 async function parseBody<T>(req: http.IncomingMessage): Promise<T> {
   return new Promise((resolve, reject) => {
@@ -25,19 +26,15 @@ export async function handleCreateAccount(
   try {
     const body = await parseBody<CreateAccountRequest>(req);
 
-    if (!body.direction || !['debit', 'credit'].includes(body.direction)) {
-      res.writeHead(HTTP_STATUS.BAD_REQUEST, CONTENT_TYPE.JSON);
-      res.end(JSON.stringify({ error: ERROR_MESSAGES.INVALID_DIRECTION }));
+    if (!body.direction || ![ACCOUNT_DIRECTION.DEBIT, ACCOUNT_DIRECTION.CREDIT].includes(body.direction)) {
+      respond(res, HTTP_STATUS.BAD_REQUEST, { error: ERROR_MESSAGES.INVALID_DIRECTION });
       return;
     }
 
     const account = createAccount(body);
-
-    res.writeHead(HTTP_STATUS.CREATED, CONTENT_TYPE.JSON);
-    res.end(JSON.stringify(account));
+    respond(res, HTTP_STATUS.CREATED, account);
   } catch (error) {
-    res.writeHead(HTTP_STATUS.BAD_REQUEST, CONTENT_TYPE.JSON);
-    res.end(JSON.stringify({ error: ERROR_MESSAGES.BAD_REQUEST }));
+    respond(res, HTTP_STATUS.BAD_REQUEST, { error: ERROR_MESSAGES.BAD_REQUEST });
   }
 }
 
@@ -48,21 +45,18 @@ export async function handleGetAccount(
 ): Promise<void> {
   const id = params.id;
   if (!id) {
-    res.writeHead(HTTP_STATUS.BAD_REQUEST, CONTENT_TYPE.JSON);
-    res.end(JSON.stringify({ error: ERROR_MESSAGES.ACCOUNT_ID_REQUIRED }));
+    respond(res, HTTP_STATUS.BAD_REQUEST, { error: ERROR_MESSAGES.ACCOUNT_ID_REQUIRED });
     return;
   }
 
   const account = getAccount(id);
 
   if (!account) {
-    res.writeHead(HTTP_STATUS.NOT_FOUND, CONTENT_TYPE.JSON);
-    res.end(JSON.stringify({ error: ERROR_MESSAGES.ACCOUNT_NOT_FOUND }));
+    respond(res, HTTP_STATUS.NOT_FOUND, { error: ERROR_MESSAGES.ACCOUNT_NOT_FOUND });
     return;
   }
 
-  res.writeHead(HTTP_STATUS.OK, CONTENT_TYPE.JSON);
-  res.end(JSON.stringify(account));
+  respond(res, HTTP_STATUS.OK, account);
 }
 
 export async function handleDeleteAccount(
@@ -72,19 +66,16 @@ export async function handleDeleteAccount(
 ): Promise<void> {
   const id = params.id;
   if (!id) {
-    res.writeHead(HTTP_STATUS.BAD_REQUEST, CONTENT_TYPE.JSON);
-    res.end(JSON.stringify({ error: ERROR_MESSAGES.ACCOUNT_ID_REQUIRED }));
+    respond(res, HTTP_STATUS.BAD_REQUEST, { error: ERROR_MESSAGES.ACCOUNT_ID_REQUIRED });
     return;
   }
 
   const result = disableAccount(id);
 
   if (!result.success) {
-    res.writeHead(HTTP_STATUS.BAD_REQUEST, CONTENT_TYPE.JSON);
-    res.end(JSON.stringify({ error: result.error }));
+    respond(res, HTTP_STATUS.BAD_REQUEST, { error: result.error! });
     return;
   }
 
-  res.writeHead(HTTP_STATUS.NO_CONTENT);
-  res.end();
+  respond(res, HTTP_STATUS.NO_CONTENT);
 }

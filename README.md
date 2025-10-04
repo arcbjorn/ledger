@@ -9,7 +9,7 @@ See [INSTRUCTIONS.md](./INSTRUCTIONS.md) for double-entry accounting rules and r
 - [Installation](#installation)
 - [Usage](#usage)
 - [API Endpoints](#api-endpoints)
-- [Testing](#testing)
+- [Unit & Integration Testing](#unit--integration-testing)
 - [Project Structure](#project-structure)
 - [Tech Stack](#tech-stack)
 - [Account Lifecycle](#account-lifecycle)
@@ -156,9 +156,15 @@ Create a new transaction.
 - **Disabling**: Accounts can be disabled to prevent future transactions while preserving transaction history
 - **Deletion**: Accounts cannot be deleted once created to maintain ledger integrity
 
-## Testing
+## Unit & Integration Testing
 
-Run the included test script:
+Run unit tests:
+
+```bash
+pnpm test
+```
+
+Run integration tests:
 
 ```bash
 ./test.sh

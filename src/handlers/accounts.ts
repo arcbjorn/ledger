@@ -1,5 +1,5 @@
 import http from 'node:http';
-import { CreateAccountRequest } from '@models/types.ts';
+import type { CreateAccountRequest } from '@models/types.ts';
 import { createAccount, getAccount } from '@services/ledger.ts';
 
 async function parseBody<T>(req: http.IncomingMessage): Promise<T> {
@@ -45,7 +45,14 @@ export async function handleGetAccount(
   res: http.ServerResponse,
   params: Record<string, string>
 ): Promise<void> {
-  const account = getAccount(params.id);
+  const id = params.id;
+  if (!id) {
+    res.writeHead(400, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: 'Account ID required' }));
+    return;
+  }
+
+  const account = getAccount(id);
 
   if (!account) {
     res.writeHead(404, { 'Content-Type': 'application/json' });

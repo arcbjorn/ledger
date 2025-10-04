@@ -2,6 +2,18 @@
 
 A TypeScript implementation of a double-entry accounting ledger system with an HTTP/JSON API.
 
+## Table of Contents
+
+- [Features](#features)
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Usage](#usage)
+- [API Endpoints](#api-endpoints)
+- [Double-Entry Accounting Rules](#double-entry-accounting-rules)
+- [Testing](#testing)
+- [Project Structure](#project-structure)
+- [Tech Stack](#tech-stack)
+
 ## Features
 
 - **Double-entry accounting** - Every transaction balances debits and credits
@@ -227,7 +239,3 @@ ledger/
 - **Build Tool**: Vite
 - **Dev Server**: vite-node
 - **Package Manager**: pnpm
-
-## License
-
-ISC

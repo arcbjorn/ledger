@@ -55,7 +55,7 @@ Here's the schema for an entry:
 
 | Field     | Description                                               |
 |-----------|-----------------------------------------------------------|
-| id        | If not provided it is generated on object creation.       |
+| id        | Always generated on object creation.                      |
 | direction | Required. Must be either "debit" or "credit".             |
 | amount    | Represents the amount of the entry in USD.                |
 
@@ -95,9 +95,9 @@ create transactions. They'll do so using the HTTP/JSON API defined here.
 
 | Field     | Description                                               |
 |-----------|-----------------------------------------------------------|
-| id        | If not provided it is generated on object creation.       |
-| name      | Optional label for the account.                           |                                                
-| balance   | Represents the account’s initial balance in USD.          |
+| id        | Always generated on object creation.                      |
+| name      | Optional label for the account.                           |
+| balance   | Represents the account's initial balance in USD.          |
 | direction | Required. Must be either "debit" or "credit".             |
 
 **Example Request:**
@@ -148,7 +148,7 @@ curl --location --request GET 'localhost:5000/accounts/fa967ec9-5be2-4c26-a874-7
 
 | Field   | Description                                               |
 |---------|-----------------------------------------------------------|
-| id      | If not provided it is generated on object creation.       |
+| id      | Always generated on object creation.                      |
 | name    | Optional label for the account.                           |
 | entries | an array of ledger entry objects                          |
 

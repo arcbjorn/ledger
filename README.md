@@ -17,7 +17,7 @@ A TypeScript implementation of a double-entry accounting ledger system with an H
 ## Features
 
 - **Double-entry accounting** - Every transaction balances debits and credits
-- **Account management** - Create and track debit/credit accounts
+- **Account management** - Create, track and disable debit/credit accounts
 - **Transaction validation** - Automatic balance verification
 - **In-memory storage** - Fast, simple data persistence
 - **RESTful API** - Clean HTTP/JSON endpoints

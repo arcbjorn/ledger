@@ -61,8 +61,8 @@ describe('Router', () => {
       router.get('/test', handler);
 
       expect(router['routes']).toHaveLength(1);
-      expect(router['routes'][0].method).toBe(HTTP_METHOD.GET);
-      expect(router['routes'][0].handler).toBe(handler);
+      expect(router['routes'][0]?.method).toBe(HTTP_METHOD.GET);
+      expect(router['routes'][0]?.handler).toBe(handler);
     });
 
     it('should register POST route', () => {
@@ -70,7 +70,7 @@ describe('Router', () => {
       router.post('/test', handler);
 
       expect(router['routes']).toHaveLength(1);
-      expect(router['routes'][0].method).toBe(HTTP_METHOD.POST);
+      expect(router['routes'][0]?.method).toBe(HTTP_METHOD.POST);
     });
 
     it('should register DELETE route', () => {
@@ -78,7 +78,7 @@ describe('Router', () => {
       router.delete('/test', handler);
 
       expect(router['routes']).toHaveLength(1);
-      expect(router['routes'][0].method).toBe(HTTP_METHOD.DELETE);
+      expect(router['routes'][0]?.method).toBe(HTTP_METHOD.DELETE);
     });
 
     it('should register multiple routes', () => {
@@ -108,7 +108,7 @@ describe('Router', () => {
     it('should match paths with single parameter', async () => {
       let capturedId = '';
       router.get('/accounts/:id', (_req, _res, params) => {
-        capturedId = params.id;
+        capturedId = params.id ?? '';
       });
 
       const req = createMockRequest(HTTP_METHOD.GET, '/accounts/test-123');
@@ -324,7 +324,7 @@ describe('Router', () => {
     it('should handle parameters with special characters', async () => {
       let capturedId = '';
       router.get('/items/:id', (_req, _res, params) => {
-        capturedId = params.id;
+        capturedId = params.id ?? '';
       });
 
       const req = createMockRequest(HTTP_METHOD.GET, '/items/test-id_123');
@@ -338,7 +338,7 @@ describe('Router', () => {
     it('should handle UUID parameters', async () => {
       let capturedId = '';
       router.get('/accounts/:id', (_req, _res, params) => {
-        capturedId = params.id;
+        capturedId = params.id ?? '';
       });
 
       const uuid = '550e8400-e29b-41d4-a716-446655440000';
@@ -405,7 +405,7 @@ describe('Router', () => {
     it('should handle empty parameter values', async () => {
       let capturedId = '';
       router.get('/items/:id', (_req, _res, params) => {
-        capturedId = params.id;
+        capturedId = params.id ?? '';
       });
 
       const req = createMockRequest(HTTP_METHOD.GET, '/items/');

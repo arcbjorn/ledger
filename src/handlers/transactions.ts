@@ -1,6 +1,7 @@
 import http from 'node:http';
 import type { CreateTransactionRequest } from '@/types/index';
 import { createTransaction } from '@services/ledger.ts';
+import { HTTP_STATUS, CONTENT_TYPE, ERROR_MESSAGES } from '@constants';
 
 async function parseBody<T>(req: http.IncomingMessage): Promise<T> {
   return new Promise((resolve, reject) => {
@@ -10,7 +11,7 @@ async function parseBody<T>(req: http.IncomingMessage): Promise<T> {
       try {
         resolve(JSON.parse(body));
       } catch (error) {
-        reject(new Error('Invalid JSON'));
+        reject(new Error(ERROR_MESSAGES.INVALID_JSON));
       }
     });
     req.on('error', reject);
@@ -25,23 +26,23 @@ export async function handleCreateTransaction(
     const body = await parseBody<CreateTransactionRequest>(req);
 
     if (!body.entries || !Array.isArray(body.entries) || body.entries.length === 0) {
-      res.writeHead(400, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ error: 'Invalid entries' }));
+      res.writeHead(HTTP_STATUS.BAD_REQUEST, CONTENT_TYPE.JSON);
+      res.end(JSON.stringify({ error: ERROR_MESSAGES.INVALID_ENTRIES }));
       return;
     }
 
     const result = createTransaction(body);
 
     if (!result.success) {
-      res.writeHead(400, { 'Content-Type': 'application/json' });
+      res.writeHead(HTTP_STATUS.BAD_REQUEST, CONTENT_TYPE.JSON);
       res.end(JSON.stringify({ error: result.error }));
       return;
     }
 
-    res.writeHead(201, { 'Content-Type': 'application/json' });
+    res.writeHead(HTTP_STATUS.CREATED, CONTENT_TYPE.JSON);
     res.end(JSON.stringify(result.transaction));
   } catch (error) {
-    res.writeHead(400, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ error: 'Bad request' }));
+    res.writeHead(HTTP_STATUS.BAD_REQUEST, CONTENT_TYPE.JSON);
+    res.end(JSON.stringify({ error: ERROR_MESSAGES.BAD_REQUEST }));
   }
 }

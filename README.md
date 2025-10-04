@@ -213,21 +213,27 @@ ledger/
 │   │   └── index.ts          # Type exports
 │   ├── services/
 │   │   ├── storage.ts        # In-memory data store
+│   │   ├── storage.test.ts   # Storage unit tests
 │   │   ├── ledger.ts         # Business logic
-│   │   └── ledger.test.ts    # Ledger unit tests
+│   │   ├── ledger.test.ts    # Ledger unit tests
+│   │   └── lock.ts           # Concurrency control (optional)
 │   ├── handlers/
 │   │   ├── router.ts         # HTTP routing
 │   │   ├── router.test.ts    # Router unit tests
 │   │   ├── routes.ts         # Route registration
 │   │   ├── accounts.ts       # Account endpoints
-│   │   └── transactions.ts   # Transaction endpoints
+│   │   ├── accounts.test.ts  # Account handler tests
+│   │   ├── transactions.ts   # Transaction endpoints
+│   │   └── transactions.test.ts # Transaction handler tests
 │   ├── utils/
 │   │   └── response.ts       # HTTP response helpers
 │   ├── constants.ts          # Shared constants
+│   ├── openapi.ts            # OpenAPI 3.1 specification
 │   └── server.ts             # Entry point
 ├── vite.config.ts            # Vite configuration
 ├── vitest.config.ts          # Vitest configuration
 ├── tsconfig.json             # TypeScript configuration
+├── test.sh                   # Integration test script
 └── package.json
 ```
 

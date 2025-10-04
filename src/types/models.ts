@@ -5,6 +5,7 @@ export interface Account {
   name?: string;
   balance: number;
   direction: Direction;
+  disabled: boolean;
 }
 
 export interface Entry {

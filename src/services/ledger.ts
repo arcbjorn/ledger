@@ -59,7 +59,7 @@ function validateTransactionBalance(
  */
 export function createAccount(request: CreateAccountRequest): Account {
   const account: Account = {
-    id: request.id || randomUUID(),
+    id: randomUUID(),
     balance: request.balance ?? 0,
     direction: request.direction,
   };
@@ -110,7 +110,7 @@ export function createTransaction(
 
   // Create transaction
   const transaction: Transaction = {
-    id: request.id || randomUUID(),
+    id: randomUUID(),
     entries,
   };
 

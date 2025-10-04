@@ -5,7 +5,6 @@ A TypeScript implementation of a double-entry accounting ledger system with an H
 ## Table of Contents
 
 - [Features](#features)
-- [Requirements](#requirements)
 - [Installation](#installation)
 - [Usage](#usage)
 - [API Endpoints](#api-endpoints)
@@ -22,12 +21,9 @@ A TypeScript implementation of a double-entry accounting ledger system with an H
 - **In-memory storage** - Fast, simple data persistence
 - **RESTful API** - Clean HTTP/JSON endpoints
 
-## Requirements
-
-- Node.js >= 18
-- pnpm >= 8
-
 ## Installation
+
+**Requirements:** Node.js >= 18, pnpm >= 8
 
 ```bash
 pnpm install
@@ -35,24 +31,10 @@ pnpm install
 
 ## Usage
 
-### Development
-
-Start the development server with hot reload:
-
-```bash
-pnpm dev
-```
-
-The API will be available at `http://localhost:5000`
-
-### Production
-
-Build and start the production server:
-
-```bash
-pnpm build
-pnpm start
-```
+| Mode | Command | URL |
+|------|---------|-----|
+| **Development** | `pnpm dev` | http://localhost:5000 |
+| **Production** | `pnpm build && pnpm start` | http://localhost:5000 |
 
 ## API Endpoints
 
@@ -65,7 +47,6 @@ POST /accounts
 **Request:**
 ```json
 {
-  "id": "optional-uuid",
   "name": "Cash",
   "direction": "debit",
   "balance": 0
@@ -107,7 +88,6 @@ POST /transactions
 **Request:**
 ```json
 {
-  "id": "optional-uuid",
   "name": "Transfer",
   "entries": [
     {
@@ -215,8 +195,10 @@ curl http://localhost:5000/accounts/acc-2
 ```
 ledger/
 ├── src/
-│   ├── models/
-│   │   └── types.ts          # TypeScript interfaces
+│   ├── types/
+│   │   ├── models.ts         # Domain types
+│   │   ├── http.ts           # Request/response types
+│   │   └── index.ts          # Type exports
 │   ├── services/
 │   │   ├── storage.ts        # In-memory data store
 │   │   └── ledger.ts         # Business logic
@@ -228,8 +210,7 @@ ledger/
 │   └── server.ts             # Entry point
 ├── vite.config.ts            # Vite configuration
 ├── tsconfig.json             # TypeScript configuration
-├── package.json
-└── README.md
+└── package.json
 ```
 
 ## Tech Stack

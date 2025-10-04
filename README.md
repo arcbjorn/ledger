@@ -258,3 +258,12 @@ git apply concurrency-control.patch
 This adds mutex locks that ensure transactions modifying the same accounts execute sequentially, while allowing concurrent transactions on different accounts.
 
 See `src/services/lock.ts` for the implementation.
+
+## Error Handling
+
+Transactions use atomic operations - either all changes succeed or none apply. Key patterns:
+
+- **Validation First**: Balance checks, account status, and business rules validated before execution
+- **Idempotency**: Transaction IDs prevent duplicate processing on retries
+- **Rollback**: Failed transactions restore previous state automatically
+- **Clear Errors**: HTTP status codes (400/404/500) with descriptive messages

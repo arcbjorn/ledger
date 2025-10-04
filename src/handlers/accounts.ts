@@ -1,5 +1,5 @@
 import http from 'node:http';
-import type { CreateAccountRequest } from '@models/types.ts';
+import type { CreateAccountRequest } from '@/types/index';
 import { createAccount, getAccount } from '@services/ledger.ts';
 
 async function parseBody<T>(req: http.IncomingMessage): Promise<T> {

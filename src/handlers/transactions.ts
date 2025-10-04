@@ -1,5 +1,5 @@
 import http from 'node:http';
-import type { CreateTransactionRequest } from '@models/types.ts';
+import type { CreateTransactionRequest } from '@/types/index';
 import { createTransaction } from '@services/ledger.ts';
 
 async function parseBody<T>(req: http.IncomingMessage): Promise<T> {

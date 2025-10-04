@@ -1,4 +1,4 @@
-import type { Account, Transaction } from '@models/types.ts';
+import type { Account, Transaction } from '@/types/index';
 
 class Storage {
   private accounts: Map<string, Account> = new Map();

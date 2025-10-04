@@ -6,13 +6,9 @@ import type {
   CreateAccountRequest,
   CreateTransactionRequest,
   Direction,
-} from '@models/types.ts';
+  TransactionValidationResult,
+} from '@/types/index';
 import { storage } from '@services/storage.ts';
-
-interface TransactionValidationResult {
-  valid: boolean;
-  error: string;
-}
 
 /**
  * Apply an entry to an account's balance

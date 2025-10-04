@@ -1,0 +1,96 @@
+diff --git a/src/handlers/transactions.ts b/src/handlers/transactions.ts
+index 9fac5a7..baa099b 100644
+--- a/src/handlers/transactions.ts
++++ b/src/handlers/transactions.ts
+@@ -30,7 +30,7 @@ export async function handleCreateTransaction(
+       return;
+     }
+ 
+-    const result = createTransaction(body);
++    const result = await createTransaction(body);
+ 
+     if (!result.success) {
+       res.writeHead(400, { 'Content-Type': 'application/json' });
+diff --git a/src/services/ledger.ts b/src/services/ledger.ts
+index c11154a..301ce7d 100644
+--- a/src/services/ledger.ts
++++ b/src/services/ledger.ts
+@@ -9,6 +9,7 @@ import type {
+   TransactionValidationResult,
+ } from '@/types/index';
+ import { storage } from '@services/storage.ts';
++import { accountLock } from '@services/lock.ts';
+ 
+ /**
+  * Apply an entry to an account's balance
+@@ -82,9 +83,9 @@ export function getAccount(id: string): Account | undefined {
+ /**
+  * Create a new transaction and apply it to all affected accounts
+  */
+-export function createTransaction(
++export async function createTransaction(
+   request: CreateTransactionRequest
+-): { success: boolean; transaction?: Transaction; error?: string } {
++): Promise<{ success: boolean; transaction?: Transaction; error?: string }> {
+   // Validate transaction balance
+   const validation = validateTransactionBalance(request.entries);
+   if (!validation.valid) {
+@@ -118,30 +119,35 @@ export function createTransaction(
+     transaction.name = request.name;
+   }
+ 
+-  // Apply transaction to all affected accounts
+-  for (const entry of entries) {
+-    const account = storage.getAccount(entry.account_id);
+-    if (!account) {
+-      // This shouldn't happen as we checked above, but TypeScript doesn't know that
+-      return {
+-        success: false,
+-        error: `Account not found: ${entry.account_id}`,
+-      };
++  // Get unique account IDs involved in this transaction
++  const accountIds = [...new Set(entries.map((entry) => entry.account_id))];
++
++  // Acquire locks on all accounts and apply transaction
++  return await accountLock.withLocks(accountIds, async () => {
++    // Apply transaction to all affected accounts
++    for (const entry of entries) {
++      const account = storage.getAccount(entry.account_id);
++      if (!account) {
++        return {
++          success: false,
++          error: `Account not found: ${entry.account_id}`,
++        };
++      }
++
++      // Update account balance
++      account.balance = applyEntryToBalance(
++        account.balance,
++        account.direction,
++        entry.direction,
++        entry.amount
++      );
++
++      storage.saveAccount(account);
+     }
+ 
+-    // Update account balance
+-    account.balance = applyEntryToBalance(
+-      account.balance,
+-      account.direction,
+-      entry.direction,
+-      entry.amount
+-    );
+-
+-    storage.saveAccount(account);
+-  }
+-
+-  // Save transaction
+-  storage.saveTransaction(transaction);
++    // Save transaction
++    storage.saveTransaction(transaction);
+ 
+-  return { success: true, transaction };
++    return { success: true, transaction };
++  });
+ }

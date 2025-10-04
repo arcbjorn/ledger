@@ -20,6 +20,7 @@ export default defineConfig({
       '@constants': path.resolve(__dirname, './src/constants.ts'),
       '@services': path.resolve(__dirname, './src/services'),
       '@handlers': path.resolve(__dirname, './src/handlers'),
+      '@utils': path.resolve(__dirname, './src/utils'),
     },
   },
 });

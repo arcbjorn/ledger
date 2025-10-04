@@ -1,5 +1,6 @@
 import http from 'node:http';
-import { HTTP_METHOD, HTTP_STATUS, CONTENT_TYPE, ERROR_MESSAGES } from '@constants';
+import { HTTP_METHOD, HTTP_STATUS, ERROR_MESSAGES } from '@constants';
+import { respond } from '@utils/response';
 
 type Handler = (
   req: http.IncomingMessage,
@@ -71,15 +72,13 @@ class Router {
         return;
       } catch (error) {
         console.error('Handler error:', error);
-        res.writeHead(HTTP_STATUS.INTERNAL_SERVER_ERROR, CONTENT_TYPE.JSON);
-        res.end(JSON.stringify({ error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR }));
+        respond(res, HTTP_STATUS.INTERNAL_SERVER_ERROR, { error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR });
         return;
       }
     }
 
     // No route matched
-    res.writeHead(HTTP_STATUS.NOT_FOUND, CONTENT_TYPE.JSON);
-    res.end(JSON.stringify({ error: ERROR_MESSAGES.NOT_FOUND }));
+    respond(res, HTTP_STATUS.NOT_FOUND, { error: ERROR_MESSAGES.NOT_FOUND });
   }
 }
 

@@ -3,4 +3,5 @@ export type {
   CreateAccountRequest,
   CreateTransactionRequest,
   TransactionValidationResult,
+  DisableAccountResult,
 } from './http.ts';

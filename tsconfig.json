@@ -16,8 +16,8 @@
     // Path Aliases
     "baseUrl": ".",
     "paths": {
-      "@models/*": [
-        "src/models/*"
+      "@/types/*": [
+        "src/types/*"
       ],
       "@services/*": [
         "src/services/*"

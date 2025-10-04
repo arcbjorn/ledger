@@ -15,3 +15,12 @@ export function respond(
   res.writeHead(status, CONTENT_TYPE.JSON);
   res.end(JSON.stringify(data));
 }
+
+export function sendJson(
+  res: http.ServerResponse,
+  status: number,
+  data: unknown
+): void {
+  res.writeHead(status, CONTENT_TYPE.JSON);
+  res.end(JSON.stringify(data, null, 2));
+}

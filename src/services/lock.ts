@@ -1,4 +1,8 @@
 /**
+ * @fileoverview OPTIONAL: check out README.md for more information on #concurrency-control.
+ */
+
+/**
  * Simple mutex lock implementation for account-level concurrency control
  */
 class AccountLock {

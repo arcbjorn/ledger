@@ -60,7 +60,8 @@ POST /accounts
   "id": "71cde2aa-b9bc-496a-a6f1-34964d05e6fd",
   "name": "Cash",
   "balance": 0,
-  "direction": "debit"
+  "direction": "debit",
+  "disabled": false
 }
 ```
 
@@ -76,9 +77,24 @@ GET /accounts/:id
   "id": "71cde2aa-b9bc-496a-a6f1-34964d05e6fd",
   "name": "Cash",
   "balance": 100,
-  "direction": "debit"
+  "direction": "debit",
+  "disabled": false
 }
 ```
+
+### Delete Account (Disable)
+
+```bash
+DELETE /accounts/:id
+```
+
+Disables an account, preventing future transactions while preserving history.
+
+**Response:** `204 No Content`
+
+**Error Responses:**
+- `400` - Account not found or already disabled
+- `404` - Invalid account ID
 
 ### Create Transaction
 
@@ -131,9 +147,10 @@ POST /transactions
 
 ### Account Lifecycle
 
-- **Creation**: Accounts are created with an initial balance and direction
+- **Creation**: Accounts are created with an initial balance and direction (disabled=false by default)
 - **Modification**: Balances can only be modified through transactions
-- **Deletion**: Accounts cannot be deleted once created. In production systems, implement soft deletion to preserve transaction history and ledger integrity
+- **Disabling**: Accounts can be disabled to prevent future transactions while preserving transaction history
+- **Deletion**: Accounts cannot be deleted once created to maintain ledger integrity
 
 ### Account Directions
 

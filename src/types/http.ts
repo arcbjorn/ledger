@@ -17,3 +17,8 @@ export interface TransactionValidationResult {
   valid: boolean;
   error: string;
 }
+
+export interface DisableAccountResult {
+  success: boolean;
+  error?: string;
+}
